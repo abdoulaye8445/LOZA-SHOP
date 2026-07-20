@@ -1,0 +1,61 @@
+<!-- products/templates/products/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Ma Boutique{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="p-5 text-center bg-primary text-white rounded">
+                <h1 class="display-4">Bienvenue sur Ma Boutique</h1>
+                <p class="lead">Découvrez notre sélection de produits de qualité</p>
+                <a href="{% url 'products:product_list' %}" class="btn btn-light btn-lg">
+                    Voir tous les produits
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4">Nos produits</h2>
+    
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3 mb-4">
+            <div class="card product-card h-100">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
+                    <p class="card-text">
+                        <span class="badge bg-secondary">{{ product.category.name }}</span>
+                        {% if product.stock > 0 %}
+                        <span class="badge bg-success">En stock</span>
+                        {% else %}
+                        <span class="badge bg-danger">Rupture</span>
+                        {% endif %}
+                    </p>
+                    <h5 class="text-primary">{{ product.price }} €</h5>
+                    <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-primary w-100">
+                        Voir le produit
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <h4>Aucun produit disponible</h4>
+                <p>Revenez plus tard pour découvrir nos nouveautés.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

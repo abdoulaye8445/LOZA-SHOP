@@ -1,0 +1,61 @@
+<!-- dashboard/templates/dashboard/base_admin.html -->
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Administration{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        <!-- Sidebar Admin -->
+        <div class="col-md-2 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <ul class="nav flex-column nav-pills p-2">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active bg-primary text-white{% endif %}" 
+                               href="{% url 'dashboard:index' %}">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'products' in request.resolver_match.url_name %}active bg-primary text-white{% endif %}" 
+                               href="{% url 'dashboard:products' %}">
+                                <i class="bi bi-grid"></i> Produits
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'orders' in request.resolver_match.url_name %}active bg-primary text-white{% endif %}" 
+                               href="{% url 'dashboard:orders' %}">
+                                <i class="bi bi-box"></i> Commandes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'users' in request.resolver_match.url_name %}active bg-primary text-white{% endif %}" 
+                               href="{% url 'dashboard:users' %}">
+                                <i class="bi bi-people"></i> Utilisateurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'categories' in request.resolver_match.url_name %}active bg-primary text-white{% endif %}" 
+                               href="{% url 'dashboard:categories' %}">
+                                <i class="bi bi-tags"></i> Catégories
+                            </a>
+                        </li>
+                        <li><hr class="my-2"></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{% url 'accounts:logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> Déconnexion
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenu Admin -->
+        <div class="col-md-10">
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

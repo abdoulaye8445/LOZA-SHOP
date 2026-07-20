@@ -1,0 +1,210 @@
+<!-- accounts/templates/accounts/profile.html -->
+{% extends 'base.html' %}
+
+{% block title %}Mon profil - Ma Boutique{% endblock %}
+
+{% block content %}
+<div class="container mt-4 fade-in">
+    <h1 class="mb-4"><i class="bi bi-person-circle"></i> Mon profil</h1>
+    
+    <div class="row g-4">
+        <!-- Informations personnelles -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-person"></i> Informations personnelles</h5>
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small">Nom d'utilisateur</label>
+                        <p class="fw-bold">{{ user.username }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small">Email</label>
+                        <p class="fw-bold">{{ user.email|default:"Non renseigné" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small">Nom complet</label>
+                        <p class="fw-bold">{{ user.get_full_name|default:"Non renseigné" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small">Date d'inscription</label>
+                        <p class="fw-bold">{{ user.date_joined|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small">Dernière connexion</label>
+                        <p class="fw-bold">{{ user.last_login|date:"d/m/Y à H:i"|default:"Jamais" }}</p>
+                    </div>
+                    
+                    <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="bi bi-pencil"></i> Modifier mon profil
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistiques -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-bar-chart"></i> Mes statistiques</h5>
+                    <hr>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 bg-primary bg-opacity-10 rounded-3 text-center">
+                                <i class="bi bi-box" style="font-size: 1.5rem;"></i>
+                                <h3 class="mb-0">{{ total_orders|default:0 }}</h3>
+                                <small class="text-muted">Commandes</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6">
+                            <div class="p-3 bg-success bg-opacity-10 rounded-3 text-center">
+                                <i class="bi bi-currency-euro" style="font-size: 1.5rem;"></i>
+                                <h3 class="mb-0">{{ total_spent|default:"0" }} €</h3>
+                                <small class="text-muted">Dépensé</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6">
+                            <div class="p-3 bg-warning bg-opacity-10 rounded-3 text-center">
+                                <i class="bi bi-clock" style="font-size: 1.5rem;"></i>
+                                <h3 class="mb-0">{{ pending_orders|default:0 }}</h3>
+                                <small class="text-muted">En attente</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-6">
+                            <div class="p-3 bg-info bg-opacity-10 rounded-3 text-center">
+                                <i class="bi bi-check-circle" style="font-size: 1.5rem;"></i>
+                                <h3 class="mb-0">{{ completed_orders|default:0 }}</h3>
+                                <small class="text-muted">Terminées</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions rapides -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-lightning"></i> Actions rapides</h5>
+                    <hr>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'orders:orders' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-box"></i> Voir mes commandes
+                        </a>
+                        <a href="{% url 'products:home' %}" class="btn btn-outline-success">
+                            <i class="bi bi-shop"></i> Continuer mes achats
+                        </a>
+                        <a href="{% url 'cart:cart_view' %}" class="btn btn-outline-warning">
+                            <i class="bi bi-cart"></i> Voir mon panier
+                        </a>
+                        {% if user.is_superuser or user.is_staff %}
+                        <a href="{% url 'dashboard:index' %}" class="btn btn-outline-danger">
+                            <i class="bi bi-speedometer2"></i> Administration
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Modifier le profil -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil"></i> Modifier mon profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'accounts:profile_update' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">Prénom</label>
+                        <input type="text" name="first_name" id="first_name" 
+                               class="form-control" value="{{ user.first_name }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Nom</label>
+                        <input type="text" name="last_name" id="last_name" 
+                               class="form-control" value="{{ user.last_name }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" id="email" 
+                               class="form-control" value="{{ user.email }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Formulaire de changement de mot de passe -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-key"></i> Changer mon mot de passe</h5>
+                    <hr>
+                    
+                    <form method="POST" action="{% url 'accounts:password_change' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="old_password" class="form-label">Mot de passe actuel</label>
+                            <input type="password" name="old_password" id="old_password" 
+                                   class="form-control" placeholder="Entrez votre mot de passe actuel" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="new_password1" class="form-label">Nouveau mot de passe</label>
+                            <input type="password" name="new_password1" id="new_password1" 
+                                   class="form-control" placeholder="Entrez votre nouveau mot de passe" required>
+                            <div class="form-text">
+                                <small>Le mot de passe doit contenir au moins 8 caractères.</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="new_password2" class="form-label">Confirmer le nouveau mot de passe</label>
+                            <input type="password" name="new_password2" id="new_password2" 
+                                   class="form-control" placeholder="Confirmez votre nouveau mot de passe" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="bi bi-key"></i> Changer le mot de passe
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-opacity-10 {
+        --bs-bg-opacity: 0.1;
+    }
+</style>
+{% endblock %}
