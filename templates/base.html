@@ -1,52 +1,675 @@
+<!-- templates/base.html -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Ma Boutique{% endblock %}</title>
+
+
+    <meta name="description" content="LOZA Shop - L'élégance à portée de clic. Découvrez notre sélection exclusive de produits de luxe.">
+<meta name="keywords" content="luxe, élégance, shopping, produits premium">
+<meta property="og:title" content="LOZA Shop - Luxury & Elegance">
+    <title>{% block title %}LOZA Shop{% endblock %}</title>
+    
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        .product-card:hover { transform: translateY(-5px); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .cart-badge { position: absolute; top: -8px; right: -8px; font-size: 0.7rem; }
-        footer { margin-top: 50px; }
+        /* ============ VARIABLES ============ */
+        :root {
+            --primary: #1A1A2E;
+            --primary-light: #2D2D44;
+            --secondary: #E94560;
+            --accent: #F5C518;
+            --gold: #D4AF37;
+            --dark: #0F0F1A;
+            --gray: #6B7280;
+            --light: #F8F9FA;
+            --white: #FFFFFF;
+            --shadow: 0 10px 40px rgba(0,0,0,0.08);
+            --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
+            --radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* ============ RESET ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+        
+        /* ============ NAVBAR ============ */
+        .navbar-custom {
+            background: var(--primary);
+            padding: 0.8rem 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .navbar-custom .navbar-brand {
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: var(--gold) !important;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+        
+        .navbar-custom .navbar-brand .highlight {
+            color: var(--secondary);
+        }
+        
+        .navbar-custom .navbar-brand small {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+            display: block;
+            font-weight: 300;
+            margin-top: -5px;
+        }
+        
+        .navbar-custom .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .navbar-custom .nav-link:hover {
+            color: var(--gold) !important;
+            background: rgba(213, 175, 55, 0.1);
+        }
+        
+        .navbar-custom .nav-link.active {
+            color: var(--gold) !important;
+            background: rgba(213, 175, 55, 0.15);
+        }
+        
+        .navbar-custom .nav-link .badge {
+            background: var(--secondary);
+            color: white;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 50%;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .navbar-custom .dropdown-menu {
+            border: none;
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+            padding: 0.5rem;
+            background: var(--primary);
+            border: 1px solid rgba(213, 175, 55, 0.2);
+        }
+        
+        .navbar-custom .dropdown-item {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            transition: var(--transition);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .navbar-custom .dropdown-item:hover {
+            background: rgba(213, 175, 55, 0.15);
+            color: var(--gold);
+        }
+        
+        .navbar-custom .dropdown-divider {
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        /* ============ SEARCH ============ */
+        .search-form .form-control {
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            padding-left: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .search-form .form-control::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .search-form .form-control:focus {
+            border-color: var(--gold);
+            background: rgba(255,255,255,0.08);
+            box-shadow: none;
+        }
+        
+        .search-form .btn-search {
+            border-radius: 50px;
+            margin-left: -40px;
+            background: var(--gold);
+            border: none;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+        
+        .search-form .btn-search:hover {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        /* ============ HERO BANNER ============ */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            padding: 5rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid var(--gold);
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(213, 175, 55, 0.08), transparent);
+            border-radius: 50%;
+        }
+        
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.06), transparent);
+            border-radius: 50%;
+        }
+        
+        .hero-section .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-section .hero-title {
+            font-weight: 900;
+            font-size: 4rem;
+            color: white;
+            line-height: 1.1;
+        }
+        
+        .hero-section .hero-title .gold {
+            color: var(--gold);
+        }
+        
+        .hero-section .hero-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.2rem;
+            max-width: 500px;
+            margin-top: 1rem;
+        }
+        
+        .hero-section .btn-hero {
+            background: var(--gold);
+            color: var(--primary);
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            border: none;
+        }
+        
+        .hero-section .btn-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(213, 175, 55, 0.4);
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .hero-section .btn-outline-hero {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .hero-section .btn-outline-hero:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: translateY(-3px);
+        }
+        
+        /* ============ PRODUCT CARDS ============ */
+        .product-card {
+            background: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            height: 100%;
+            position: relative;
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .product-card:hover::before {
+            opacity: 1;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .product-card .card-img-top {
+            height: 240px;
+            object-fit: cover;
+            background: var(--light);
+            transition: var(--transition);
+        }
+        
+        .product-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+        
+        .product-card .card-body {
+            padding: 1.5rem;
+        }
+        
+        .product-card .product-category {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+        }
+        
+        .product-card .product-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+            color: var(--dark);
+        }
+        
+        .product-card .product-price {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--secondary);
+        }
+        
+        .product-card .btn-outline-primary {
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .product-card .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* ============ BADGES ============ */
+        .badge-gold {
+            background: var(--gold);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ED573;
+        }
+        
+        .badge-danger {
+            background: rgba(255, 71, 87, 0.15);
+            color: #FF4757;
+        }
+        
+        /* ============ SECTION TITLES ============ */
+        .section-title {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+            color: var(--primary);
+        }
+        
+        .section-title .gold {
+            color: var(--gold);
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 4px;
+        }
+        
+        .section-title.center::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* ============ FOOTER ============ */
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 4rem 0 2rem;
+            margin-top: auto;
+            border-top: 3px solid var(--gold);
+        }
+        
+        .footer h5 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+        
+        .footer a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: var(--transition);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer a:hover {
+            color: var(--gold);
+            transform: translateX(5px);
+        }
+        
+        .footer .social-links a {
+            display: inline-block;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .footer .social-links a:hover {
+            transform: translateY(-3px);
+            color: var(--gold);
+        }
+        
+        .footer .divider {
+            border-color: rgba(255,255,255,0.08);
+            margin: 2rem 0;
+        }
+        
+        .footer .footer-brand {
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--gold);
+        }
+        
+        .footer .footer-brand .highlight {
+            color: var(--secondary);
+        }
+        
+        /* ============ ANIMATIONS ============ */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 992px) {
+            .hero-section .hero-title {
+                font-size: 2.8rem;
+            }
+            .hero-section {
+                padding: 3rem 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section .hero-title {
+                font-size: 2.2rem;
+            }
+            .hero-section .hero-subtitle {
+                font-size: 1rem;
+            }
+            .product-card .card-img-top {
+                height: 200px;
+            }
+            .section-title {
+                font-size: 1.6rem;
+            }
+            .navbar-custom .navbar-brand {
+                font-size: 1.4rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-section {
+                padding: 2rem 0;
+            }
+            .hero-section .hero-title {
+                font-size: 1.8rem;
+            }
+            .product-card .card-img-top {
+                height: 180px;
+            }
+        }
+        
+        /* ============ SCROLL TO TOP ============ */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            color: var(--primary);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(213, 175, 55, 0.4);
+            transition: var(--transition);
+            display: none;
+            z-index: 999;
+            font-weight: 700;
+        }
+        
+        .scroll-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(213, 175, 55, 0.5);
+            background: var(--secondary);
+            color: white;
+        }
     </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'products:home' %}">🛒 Ma Boutique</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <a class="navbar-brand" href="{% url 'products:home' %}">
+                LOZA<span class="highlight">Shop</span>
+                <small>✦ LUXURY & ELEGANCE ✦</small>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'products:home' %}">Accueil</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                           href="{% url 'products:home' %}">
+                            <i class="bi bi-house"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}" 
+                           href="{% url 'products:product_list' %}">
+                            <i class="bi bi-grid"></i> Boutique
+                        </a>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'orders:orders' %}">Mes commandes</a>
+                        <a class="nav-link {% if request.resolver_match.app_name == 'orders' %}active{% endif %}" 
+                           href="{% url 'orders:orders' %}">
+                            <i class="bi bi-box"></i> Mes commandes
+                        </a>
                     </li>
                     {% endif %}
                 </ul>
+                
+                <!-- Barre de recherche -->
+                <form class="d-flex search-form me-3" method="GET" action="{% url 'products:search' %}">
+                    <input class="form-control form-control-sm" type="search" name="q" 
+                           placeholder="Rechercher..." style="width: 180px;">
+                    <button class="btn btn-search btn-sm" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+                
                 <ul class="navbar-nav ms-auto">
+                    <!-- Dashboard Admin -->
                     {% if user.is_superuser or user.is_staff %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard:index' %}">
-                            <i class="bi bi-speedometer2"></i> Dashboard
+                        <a class="nav-link" href="{% url 'dashboard:index' %}" title="Dashboard">
+                            <i class="bi bi-speedometer2"></i>
                         </a>
                     </li>
                     {% endif %}
+                    
+                    <!-- Panier -->
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{% url 'cart:cart_view' %}">
-                            <i class="bi bi-cart"></i>
-                            Panier
+                            <i class="bi bi-bag" style="font-size: 1.2rem;"></i>
                             {% if cart_total_items > 0 %}
-                            <span class="badge bg-danger rounded-pill cart-badge">{{ cart_total_items }}</span>
+                            <span class="badge">{{ cart_total_items }}</span>
                             {% endif %}
                         </a>
                     </li>
+
+
+                    <!-- Dans la navbar, ajouter après le panier -->
+<li class="nav-item dropdown">
+    <a class="nav-link position-relative" href="#" id="notifDropdown" 
+       role="button" data-bs-toggle="dropdown">
+        <i class="bi bi-bell"></i>
+        <span class="badge" id="notifBadge" style="background: var(--secondary); position: absolute; top: -5px; right: -5px; font-size: 0.6rem; padding: 2px 7px; border-radius: 50%;">0</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" id="notifList" style="width: 350px; max-height: 400px; overflow-y: auto; background: white;">
+        <li><h6 class="dropdown-header">Notifications</h6></li>
+        <li><hr class="dropdown-divider"></li>
+        <li class="text-center text-muted py-2" id="noNotif">Aucune notification</li>
+    </ul>
+</li>
+
+<!-- JavaScript pour les notifications -->
+<script>
+function loadNotifications() {
+    fetch('/notifications/api/')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('notifBadge');
+            const list = document.getElementById('notifList');
+            const noNotif = document.getElementById('noNotif');
+            
+            badge.textContent = data.count;
+            
+            document.querySelectorAll('.notif-item').forEach(el => el.remove());
+            
+            if (data.count > 0) {
+                noNotif.style.display = 'none';
+                data.notifications.forEach(n => {
+                    const item = document.createElement('li');
+                    item.className = 'notif-item';
+                    const link = n.link ? n.link : '#';
+                    item.innerHTML = `
+                        <a href="${link}" class="dropdown-item" style="white-space: normal;">
+                            <strong>${n.title}</strong>
+                            <p class="text-muted small mb-0">${n.message}</p>
+                            <small class="text-muted">${n.created_at}</small>
+                        </a>
+                    `;
+                    list.appendChild(item);
+                });
+            } else {
+                noNotif.style.display = 'block';
+            }
+        });
+}
+
+setInterval(loadNotifications, 30000);
+loadNotifications();
+</script>
+                    
+                    <!-- Utilisateur -->
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
@@ -61,6 +684,11 @@
                             <li>
                                 <a class="dropdown-item" href="{% url 'orders:orders' %}">
                                     <i class="bi bi-box"></i> Mes commandes
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'products:wishlist' %}">
+                                    <i class="bi bi-heart"></i> Mes favoris
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -81,8 +709,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:register' %}">
-                            <i class="bi bi-person-plus"></i> Inscription
+                        <a class="nav-link btn text-white px-3" href="{% url 'accounts:register' %}" 
+                           style="border-radius: 50px; background: var(--gold); color: var(--primary) !important; font-weight: 600;">
+                            S'inscrire
                         </a>
                     </li>
                     {% endif %}
@@ -91,27 +720,124 @@
         </div>
     </nav>
 
-    <main>
+    <!-- ============ MESSAGES ============ -->
+    <div class="container mt-3">
         {% if messages %}
-        <div class="container mt-3">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius: var(--radius); border-left: 4px solid var(--gold);">
+                <i class="bi {% if message.tags == 'success' %}bi-check-circle{% elif message.tags == 'error' %}bi-x-circle{% elif message.tags == 'warning' %}bi-exclamation-triangle{% else %}bi-info-circle{% endif %}"></i>
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             {% endfor %}
-        </div>
         {% endif %}
+    </div>
 
+    <!-- ============ CONTENU ============ -->
+    <main>
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-dark text-white py-4">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2026 Ma Boutique. Tous droits réservés.</p>
+    <!-- ============ FOOTER ============ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        LOZA<span class="highlight">Shop</span>
+                    </div>
+                    <p class="text-white-50 mt-3" style="font-size: 0.95rem; max-width: 350px;">
+                        L'excellence à portée de clic. Découvrez une sélection unique de produits 
+                        alliant qualité, élégance et raffinement.
+                    </p>
+                    <div class="social-links mt-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-youtube"></i></a>
+                        <a href="#"><i class="bi bi-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5>Navigation</h5>
+                    <a href="{% url 'products:home' %}">Accueil</a>
+                    <a href="{% url 'products:product_list' %}">Boutique</a>
+                    <a href="#">Nouveautés</a>
+                    <a href="#">Promotions</a>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5>Mon compte</h5>
+                    <a href="{% url 'accounts:profile' %}">Mon profil</a>
+                    <a href="{% url 'orders:orders' %}">Mes commandes</a>
+                    <a href="{% url 'products:wishlist' %}">Mes favoris</a>
+                    <a href="{% url 'cart:cart_view' %}">Mon panier</a>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <h5>Contact</h5>
+                    <p class="text-white-50 mb-1">
+                        <i class="bi bi-envelope" style="color: var(--gold);"></i> contact@lozashop.com
+                    </p>
+                    <p class="text-white-50 mb-1">
+                        <i class="bi bi-telephone" style="color: var(--gold);"></i> +33 1 23 45 67 89
+                    </p>
+                    <p class="text-white-50 mb-3">
+                        <i class="bi bi-geo-alt" style="color: var(--gold);"></i> Paris, France
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge" style="background: var(--gold); color: var(--primary); padding: 0.4rem 0.8rem;">
+                            <i class="bi bi-shield-check"></i> Paiement sécurisé
+                        </span>
+                        <span class="badge" style="background: var(--secondary); color: white; padding: 0.4rem 0.8rem;">
+                            <i class="bi bi-truck"></i> Livraison rapide
+                        </span>
+                        <span class="badge" style="background: var(--primary-light); color: white; padding: 0.4rem 0.8rem;">
+                            <i class="bi bi-headset"></i> Support 24/7
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <hr class="divider">
+            <div class="text-center text-white-50" style="font-size: 0.85rem;">
+                <p class="mb-0">
+                    &copy; 2026 LOZA Shop — Tous droits réservés. 
+                    <span class="text-white-50">✦</span> 
+                    Designed with <i class="bi bi-heart-fill" style="color: var(--secondary);"></i>
+                </p>
+            </div>
         </div>
     </footer>
 
+    <!-- ============ SCROLL TO TOP ============ -->
+    <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- ============ SCRIPTS ============ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Scroll to top button
+        window.addEventListener('scroll', function() {
+            const btn = document.getElementById('scrollTop');
+            if (window.pageYOffset > 300) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        });
+        
+        // Auto dismiss alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const closeBtn = alert.querySelector('.btn-close');
+                    if (closeBtn) closeBtn.click();
+                }, 5000);
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

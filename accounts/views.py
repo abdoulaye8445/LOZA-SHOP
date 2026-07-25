@@ -4,11 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.models import User
 from orders.models import Order
 
 def register(request):
-    """Inscription d'un nouvel utilisateur"""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -21,8 +19,6 @@ def register(request):
 
 @login_required
 def profile(request):
-    """Page de profil utilisateur"""
-    # Statistiques de l'utilisateur
     user_orders = Order.objects.filter(user=request.user)
     total_orders = user_orders.count()
     total_spent = sum(order.total_amount for order in user_orders if order.status != 'cancelled')
@@ -39,7 +35,6 @@ def profile(request):
 
 @login_required
 def profile_update(request):
-    """Mettre à jour le profil utilisateur"""
     if request.method == 'POST':
         user = request.user
         user.first_name = request.POST.get('first_name', '')
@@ -51,7 +46,6 @@ def profile_update(request):
 
 @login_required
 def password_change(request):
-    """Changer le mot de passe"""
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -60,5 +54,5 @@ def password_change(request):
             messages.success(request, 'Votre mot de passe a été changé avec succès !')
             return redirect('accounts:profile')
         else:
-            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
+            messages.error(request, 'Veuillez corriger les erreurs.')
     return redirect('accounts:profile')

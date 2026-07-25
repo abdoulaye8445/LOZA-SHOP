@@ -4,62 +4,75 @@
 {% block title %}Tous les produits - Ma Boutique{% endblock %}
 
 {% block content %}
-<div class="container mt-4 fade-in">
+<div class="container mt-4">
     <div class="row">
-        <!-- Sidebar avec filtres -->
         <div class="col-md-3 mb-4">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="bi bi-funnel"></i> Filtres</h5>
                     <hr>
                     
-                    <!-- Recherche -->
-                    <div class="mb-3">
-                        <label class="form-label">Rechercher</label>
-                        <form method="GET" class="d-flex">
-                            <input type="text" name="search" class="form-control" 
-                                   placeholder="Rechercher..." value="{{ search_query }}">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <!-- Catégories -->
                     <div class="mb-3">
                         <label class="form-label">Catégories</label>
                         <div class="d-flex flex-column gap-1">
-                            <a href="{% url 'products:product_list' %}" class="text-decoration-none">
+                            <a href="{% url 'products:product_list' %}" class="text-decoration-none {% if not current_category %}fw-bold text-primary{% endif %}">
                                 Tous les produits
                             </a>
                             {% for category in categories %}
                             <a href="{% url 'products:product_list' %}?category={{ category.slug }}" 
-                               class="text-decoration-none {% if category.slug == current_category %}text-primary fw-bold{% endif %}">
+                               class="text-decoration-none {% if category.slug == current_category %}fw-bold text-primary{% endif %}">
                                 {{ category.name }}
                             </a>
                             {% endfor %}
                         </div>
                     </div>
                     
-                    <!-- Prix -->
-                    <div>
-                        <label class="form-label">Prix max</label>
-                        <input type="range" class="form-range" min="0" max="1000" 
-                               id="priceRange" onchange="updatePrice()">
-                        <div class="d-flex justify-content-between">
-                            <span>0 €</span>
-                            <span id="priceValue">500 €</span>
-                        </div>
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Prix</label>
+                        <form method="GET" id="priceFilter">
+                            <div class="d-flex gap-2">
+                                <input type="number" name="min_price" class="form-control form-control-sm" 
+                                       placeholder="Min" value="{{ min_price }}">
+                                <span class="align-self-center">-</span>
+                                <input type="number" name="max_price" class="form-control form-control-sm" 
+                                       placeholder="Max" value="{{ max_price }}">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary mt-2 w-100">Appliquer</button>
+                        </form>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Trier par</label>
+                        <select class="form-select" onchange="window.location.href=this.value">
+                            <option value="{% url 'products:product_list' %}" {% if not sort %}selected{% endif %}>
+                                Plus récents
+                            </option>
+                            <option value="?sort=price_asc{% if current_category %}&category={{ current_category }}{% endif %}" 
+                                    {% if sort == 'price_asc' %}selected{% endif %}>
+                                Prix croissant
+                            </option>
+                            <option value="?sort=price_desc{% if current_category %}&category={{ current_category }}{% endif %}" 
+                                    {% if sort == 'price_desc' %}selected{% endif %}>
+                                Prix décroissant
+                            </option>
+                            <option value="?sort=name{% if current_category %}&category={{ current_category }}{% endif %}" 
+                                    {% if sort == 'name' %}selected{% endif %}>
+                                Nom A-Z
+                            </option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Liste des produits -->
         <div class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3><i class="bi bi-grid"></i> Nos produits</h3>
-                <span class="text-muted">{{ products|length }} produits</span>
+                <span class="text-muted">{{ products.paginator.count }} produits</span>
             </div>
             
             <div class="row">
@@ -102,14 +115,52 @@
                 </div>
                 {% endfor %}
             </div>
+            
+            <!-- Pagination -->
+            {% if products.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in products.paginator.page_range %}
+                        {% if products.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                        {% elif i > products.number|add:'-3' and i < products.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if current_category %}&category={{ current_category }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}">
+                                {{ i }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
         </div>
     </div>
 </div>
-
-<script>
-    function updatePrice() {
-        const range = document.getElementById('priceRange');
-        document.getElementById('priceValue').textContent = range.value + ' €';
-    }
-</script>
 {% endblock %}

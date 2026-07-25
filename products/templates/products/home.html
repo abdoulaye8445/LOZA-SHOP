@@ -1,61 +1,183 @@
 <!-- products/templates/products/home.html -->
 {% extends 'base.html' %}
 
-{% block title %}Accueil - Ma Boutique{% endblock %}
+{% block title %}Accueil - LOZA Shop{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="p-5 text-center bg-primary text-white rounded">
-                <h1 class="display-4">Bienvenue sur Ma Boutique</h1>
-                <p class="lead">Découvrez notre sélection de produits de qualité</p>
-                <a href="{% url 'products:product_list' %}" class="btn btn-light btn-lg">
-                    Voir tous les produits
-                </a>
+<!-- ============ HERO ============ -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 hero-content">
+                <div class="mb-3">
+                    <span class="badge-gold">✦ Nouvelle collection</span>
+                </div>
+                <h1 class="hero-title">
+                    L'Élégance <br>à <span class="gold">Portée de Clic</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Découvrez une sélection exclusive de produits d'exception, 
+                    soigneusement choisis pour leur qualité et leur raffinement.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="{% url 'products:product_list' %}" class="btn btn-hero">
+                        <i class="bi bi-grid"></i> Explorer la boutique
+                    </a>
+                    <a href="#produits" class="btn btn-outline-hero">
+                        <i class="bi bi-arrow-down"></i> Découvrir
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block hero-content text-center">
+                <div style="position: relative;">
+                    <div style="width: 350px; height: 350px; margin: 0 auto; background: radial-gradient(circle, rgba(213,175,55,0.1), transparent); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-bag" style="font-size: 8rem; color: var(--gold); opacity: 0.3;"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</section>
 
-    <h2 class="mb-4">Nos produits</h2>
+<!-- ============ PRODUITS ============ -->
+<div class="container mt-5" id="produits">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title">
+            ✦ Nos <span class="gold">Exclusivités</span>
+        </h2>
+        <a href="{% url 'products:product_list' %}" class="text-decoration-none" style="color: var(--gold); font-weight: 600;">
+            Voir tout <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
     
-    <div class="row">
+    <div class="row g-4">
         {% for product in products %}
-        <div class="col-md-3 mb-4">
-            <div class="card product-card h-100">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
-                {% else %}
-                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                    <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
-                </div>
-                {% endif %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="product-card fade-in" style="animation-delay: {{ forloop.counter|add:1 }}00ms;">
+                <a href="{% url 'products:product_detail' product.slug %}" class="text-decoration-none">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center" style="background: var(--light); height: 240px;">
+                        <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                    </div>
+                    {% endif %}
+                </a>
                 <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
-                    <p class="card-text">
-                        <span class="badge bg-secondary">{{ product.category.name }}</span>
-                        {% if product.stock > 0 %}
-                        <span class="badge bg-success">En stock</span>
-                        {% else %}
-                        <span class="badge bg-danger">Rupture</span>
-                        {% endif %}
-                    </p>
-                    <h5 class="text-primary">{{ product.price }} €</h5>
-                    <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-primary w-100">
-                        Voir le produit
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="product-category">{{ product.category.name }}</span>
+                        <span class="badge {% if product.stock > 0 %}badge-success{% else %}badge-danger{% endif %}">
+                            {% if product.stock > 0 %}
+                            <i class="bi bi-check-circle"></i> En stock
+                            {% else %}
+                            <i class="bi bi-x-circle"></i> Rupture
+                            {% endif %}
+                        </span>
+                    </div>
+                    <a href="{% url 'products:product_detail' product.slug %}" class="text-decoration-none">
+                        <h5 class="product-name">{{ product.name }}</h5>
                     </a>
+                    <p class="text-muted small mb-2">{{ product.description|truncatechars:50 }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="product-price">{{ product.price|floatformat:2 }} €</span>
+                        <a href="{% url 'cart:add_to_cart' product.id %}" 
+                           class="btn btn-sm" style="border-radius: 50px; background: var(--primary); color: white; border: none; padding: 0.3rem 1rem;">
+                            <i class="bi bi-bag"></i> Ajouter
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info text-center">
-                <h4>Aucun produit disponible</h4>
-                <p>Revenez plus tard pour découvrir nos nouveautés.</p>
-            </div>
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+            <h3 class="mt-3">Aucun produit disponible</h3>
+            <p class="text-muted">Revenez plus tard pour découvrir nos nouveautés.</p>
         </div>
         {% endfor %}
     </div>
 </div>
+
+<!-- ============ CATEGORIES ============ -->
+<div class="container mt-5">
+    <h2 class="section-title center text-center">
+        ✦ Nos <span class="gold">Univers</span>
+    </h2>
+    <div class="row g-3 mt-3">
+        {% for category in categories %}
+        <div class="col-6 col-md-2">
+            <a href="{% url 'products:product_list' %}?category={{ category.slug }}" 
+               class="text-decoration-none">
+                <div class="card border-0 shadow-sm text-center p-4" style="border-radius: var(--radius); transition: var(--transition); background: white;">
+                    {% if category.image %}
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}" 
+                         style="width: 70px; height: 70px; object-fit: cover; border-radius: 50%; margin: 0 auto;">
+                    {% else %}
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: var(--light); margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-tag" style="font-size: 2rem; color: var(--gold);"></i>
+                    </div>
+                    {% endif %}
+                    <h6 class="mt-3 mb-0 fw-bold" style="font-size: 0.9rem;">{{ category.name }}</h6>
+                    <small class="text-muted">{{ category.products.count }} produits</small>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ============ AVANTAGES ============ -->
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-3 col-6">
+            <div class="text-center p-4" style="border-radius: var(--radius); background: white; box-shadow: var(--shadow);">
+                <i class="bi bi-truck" style="font-size: 2.5rem; color: var(--gold);"></i>
+                <h6 class="mt-2 fw-bold">Livraison Premium</h6>
+                <p class="text-muted small">Sous 24-48h</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="text-center p-4" style="border-radius: var(--radius); background: white; box-shadow: var(--shadow);">
+                <i class="bi bi-shield-check" style="font-size: 2.5rem; color: var(--gold);"></i>
+                <h6 class="mt-2 fw-bold">Paiement Sécurisé</h6>
+                <p class="text-muted small">100% garanti</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="text-center p-4" style="border-radius: var(--radius); background: white; box-shadow: var(--shadow);">
+                <i class="bi bi-arrow-return-left" style="font-size: 2.5rem; color: var(--gold);"></i>
+                <h6 class="mt-2 fw-bold">Retour Facile</h6>
+                <p class="text-muted small">Satisfait ou remboursé</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="text-center p-4" style="border-radius: var(--radius); background: white; box-shadow: var(--shadow);">
+                <i class="bi bi-gem" style="font-size: 2.5rem; color: var(--gold);"></i>
+                <h6 class="mt-2 fw-bold">Qualité Premium</h6>
+                <p class="text-muted small">Sélection exclusive</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ CTA ============ -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="p-5 text-center" style="border-radius: var(--radius); background: linear-gradient(135deg, var(--primary), var(--primary-light)); border: 2px solid var(--gold);">
+                <h2 class="text-white" style="font-weight: 800; font-size: 2.5rem;">
+                    Prêt à <span style="color: var(--gold);">Élégance</span> ?
+                </h2>
+                <p class="text-white-50 mb-4" style="font-size: 1.1rem;">
+                    Rejoignez notre communauté et découvrez une expérience shopping unique.
+                </p>
+                <a href="{% url 'products:product_list' %}" class="btn btn-hero" style="background: var(--gold); color: var(--primary); border: none; padding: 0.8rem 3rem; border-radius: 50px; font-weight: 700; transition: var(--transition);">
+                    <i class="bi bi-grid"></i> Découvrir la collection
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="height: 4rem;"></div>
 {% endblock %}

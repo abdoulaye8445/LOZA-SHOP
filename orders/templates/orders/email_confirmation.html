@@ -1,0 +1,57 @@
+<!-- orders/templates/orders/email_confirmation.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #2E4057; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8f9fa; padding: 20px; }
+        .order-details { background: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2E4057; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .total { font-weight: bold; font-size: 18px; color: #2E4057; }
+        .btn { display: inline-block; padding: 10px 20px; background: #2E4057; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Ma Boutique</h1>
+            <p>Confirmation de commande</p>
+        </div>
+        <div class="content">
+            <h2>Merci pour votre commande {{ order.user.get_full_name|default:order.user.username }} !</h2>
+            <p>Votre commande a été validée avec succès.</p>
+            <div class="order-details">
+                <h3>Détails de la commande</h3>
+                <p><strong>Numéro :</strong> {{ order.order_number }}</p>
+                <p><strong>Date :</strong> {{ order.created_at|date:"d/m/Y à H:i" }}</p>
+                <p><strong>Statut :</strong> {{ order.get_status_display }}</p>
+                <h4>Produits commandés</h4>
+                <table>
+                    <thead><tr><th>Produit</th><th>Quantité</th><th>Prix</th></tr></thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr><td>{{ item.product.name }}</td><td>{{ item.quantity }}</td><td>{{ item.get_total }} €</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot><tr><td colspan="2" class="total">Total</td><td class="total">{{ order.total_amount }} €</td></tr></tfoot>
+                </table>
+                <h4>Adresse de livraison</h4>
+                <p>{{ order.shipping_address|linebreaks }}</p>
+            </div>
+            <p style="margin-top: 20px;">
+                <a href="http://127.0.0.1:8000/orders/" class="btn">Voir mes commandes</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>© 2026 Ma Boutique - Tous droits réservés</p>
+            <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!-- products/templates/products/search_results.html -->
+{% extends 'base.html' %}
+
+{% block title %}Résultats de recherche - Ma Boutique{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">
+        <i class="bi bi-search"></i> 
+        Résultats pour "{{ query }}"
+        <span class="badge bg-secondary">{{ count }} produit(s) trouvé(s)</span>
+    </h2>
+    
+    {% if products %}
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3 mb-4">
+            <div class="card product-card h-100">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
+                    <h6 class="text-primary">{{ product.price }} €</h6>
+                    <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-primary btn-sm w-100">Voir</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-search" style="font-size: 4rem; color: #ddd;"></i>
+        <h3 class="mt-3">Aucun résultat trouvé</h3>
+        <p class="text-muted">Essayez avec d'autres mots-clés.</p>
+        <a href="{% url 'products:home' %}" class="btn btn-primary">Retour à l'accueil</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

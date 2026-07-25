@@ -1,4 +1,4 @@
-# cart/views.py - Vérifiez que cette fonction existe
+# cart/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,7 +7,6 @@ from .models import CartItem
 
 @login_required
 def cart_view(request):
-    """Afficher le panier"""
     cart_items = CartItem.objects.filter(user=request.user)
     total = sum(item.get_total() for item in cart_items)
     return render(request, 'cart/cart.html', {
@@ -17,7 +16,6 @@ def cart_view(request):
 
 @login_required
 def add_to_cart(request, product_id):
-    """Ajouter un produit au panier"""
     product = get_object_or_404(Product, id=product_id, is_active=True)
     
     if product.stock <= 0:
@@ -44,7 +42,6 @@ def add_to_cart(request, product_id):
 
 @login_required
 def remove_from_cart(request, product_id):
-    """Retirer un produit du panier (diminuer quantité)"""
     product = get_object_or_404(Product, id=product_id)
     cart_item = get_object_or_404(CartItem, user=request.user, product=product)
     
@@ -60,7 +57,6 @@ def remove_from_cart(request, product_id):
 
 @login_required
 def delete_from_cart(request, product_id):
-    """Supprimer complètement un produit du panier"""
     product = get_object_or_404(Product, id=product_id)
     cart_item = get_object_or_404(CartItem, user=request.user, product=product)
     cart_item.delete()
@@ -69,7 +65,6 @@ def delete_from_cart(request, product_id):
 
 @login_required
 def clear_cart(request):
-    """Vider complètement le panier"""
     CartItem.objects.filter(user=request.user).delete()
     messages.info(request, 'Votre panier a été vidé.')
     return redirect('cart:cart_view')

@@ -1,0 +1,162 @@
+<!-- promotions/templates/promotions/admin_coupons.html -->
+{% extends 'dashboard/base_admin.html' %}
+
+{% block title %}Gestion des codes promo - Administration{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-ticket"></i> Gestion des codes promo</h3>
+    <a href="{% url 'promotions:admin_coupon_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Créer un code promo
+    </a>
+</div>
+
+<!-- Statistiques -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body text-center">
+                <h6 class="text-white-50">Total codes</h6>
+                <h3 class="mb-0">{{ coupons|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-success text-white">
+            <div class="card-body text-center">
+                <h6 class="text-white-50">Actifs</h6>
+                <h3 class="mb-0">{{ coupons|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-danger text-white">
+            <div class="card-body text-center">
+                <h6 class="text-white-50">Inactifs</h6>
+                <h3 class="mb-0">{{ coupons|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-warning text-white">
+            <div class="card-body text-center">
+                <h6 class="text-white-50">Épuisés</h6>
+                <h3 class="mb-0">{{ coupons|length }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des codes promo -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent">
+        <h5 class="mb-0"><i class="bi bi-list"></i> Liste des codes promo</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Réduction</th>
+                        <th>Min. commande</th>
+                        <th>Période</th>
+                        <th>Utilisations</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coupon in coupons %}
+                    <tr>
+                        <td>
+                            <strong class="text-primary">{{ coupon.code }}</strong>
+                            {% if coupon.description %}
+                            <br><small class="text-muted">{{ coupon.description|truncatechars:30 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-info">
+                                {% if coupon.discount_type == 'percentage' %}
+                                    {{ coupon.discount_value }}%
+                                {% else %}
+                                    {{ coupon.discount_value }}€
+                                {% endif %}
+                            </span>
+                            {% if coupon.max_discount_amount %}
+                            <br><small class="text-muted">max {{ coupon.max_discount_amount }}€</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if coupon.min_order_amount > 0 %}
+                                {{ coupon.min_order_amount }}€
+                            {% else %}
+                                <span class="text-muted">Aucun</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>
+                                {{ coupon.valid_from|date:"d/m/Y" }}
+                                <br>→ {{ coupon.valid_to|date:"d/m/Y" }}
+                            </small>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span>{{ coupon.used_count }} / {{ coupon.usage_limit }}</span>
+                                <div class="progress" style="height: 6px; width: 100px;">
+                                    <div class="progress-bar 
+                                        {% if coupon.used_count >= coupon.usage_limit %}bg-danger
+                                        {% elif coupon.used_count > 0 %}bg-warning
+                                        {% else %}bg-success{% endif %}" 
+                                        style="width: 
+                                        {% if coupon.usage_limit > 0 %}
+                                            {% widthratio coupon.used_count coupon.usage_limit 100 %}
+                                        {% else %}
+                                            0
+                                        {% endif %}%;">
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column gap-1">
+                                <span class="badge {% if coupon.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if coupon.is_active %}✅ Actif{% else %}❌ Inactif{% endif %}
+                                </span>
+                                {% if coupon.used_count >= coupon.usage_limit %}
+                                <span class="badge bg-warning">🔒 Épuisé</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'promotions:admin_coupon_toggle' coupon.id %}" 
+                                   class="btn btn-sm {% if coupon.is_active %}btn-warning{% else %}btn-success{% endif %}"
+                                   onclick="return confirm('Changer le statut du code promo {{ coupon.code }} ?')">
+                                    <i class="bi {% if coupon.is_active %}bi-pause{% else %}bi-play{% endif %}"></i>
+                                </a>
+                                <a href="{% url 'promotions:admin_coupon_delete' coupon.id %}" 
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Supprimer le code promo {{ coupon.code }} ?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="bi bi-ticket" style="font-size: 2rem; color: #ddd;"></i>
+                            <p class="mt-2 text-muted">Aucun code promo pour le moment.</p>
+                            <a href="{% url 'promotions:admin_coupon_create' %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle"></i> Créer votre premier code promo
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

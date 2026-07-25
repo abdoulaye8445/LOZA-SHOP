@@ -1,20 +1,177 @@
 <!-- dashboard/templates/dashboard/index.html -->
 {% extends 'dashboard/base_admin.html' %}
+{% load static %}
 
 {% block title %}Dashboard - Administration{% endblock %}
 
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ============ GRAPHIQUE DES COMMANDES ============
+    const ctx1 = document.getElementById('ordersChart');
+    if (ctx1) {
+        new Chart(ctx1.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                datasets: [{
+                    label: 'Commandes',
+                    data: [12, 19, 15, 27, 22, 30, 25, 35, 28, 40, 32, 45],
+                    backgroundColor: 'rgba(46, 64, 87, 0.8)',
+                    borderColor: '#2E4057',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ============ GRAPHIQUE DU CHIFFRE D'AFFAIRES ============
+    const ctx2 = document.getElementById('revenueChart');
+    if (ctx2) {
+        new Chart(ctx2.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                datasets: [{
+                    label: 'CA (€)',
+                    data: [1200, 1900, 1500, 2700, 2200, 3000, 2800, 3500, 3200, 4000, 3800, 4500],
+                    backgroundColor: 'rgba(39, 174, 96, 0.15)',
+                    borderColor: '#27AE60',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#27AE60',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' €';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ============ GRAPHIQUE DES CATÉGORIES (PIE CHART) ============
+    const ctx3 = document.getElementById('categoriesChart');
+    if (ctx3) {
+        new Chart(ctx3.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Électronique', 'Vêtements', 'Maison', 'Sports', 'Livres'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: [
+                        '#2E4057',
+                        '#4A6FA5',
+                        '#F39C12',
+                        '#27AE60',
+                        '#E74C3C'
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+});
+
+// ============ FONCTION POUR EXPORTER EN CSV ============
+function exportOrders() {
+    window.location.href = "{% url 'dashboard:export_orders' %}";
+}
+</script>
+{% endblock %}
+
 {% block admin_content %}
+<!-- ============ HEADER AVEC BOUTON EXPORT ============ -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-speedometer2"></i> Dashboard</h3>
+    <div class="d-flex gap-2">
+        <button onclick="exportOrders()" class="btn btn-success">
+            <i class="bi bi-download"></i> Exporter les commandes (CSV)
+        </button>
+        <button onclick="window.location.reload()" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-clockwise"></i> Rafraîchir
+        </button>
+    </div>
+</div>
+
+<!-- ============ STATISTIQUES PRINCIPALES ============ -->
 <div class="row g-4">
-    <!-- Statistiques -->
     <div class="col-md-3">
         <div class="card border-0 shadow-sm bg-primary text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-white-50">Commandes</h6>
-                        <h2 class="mb-0">{{ total_orders }}</h2>
+                        <h6 class="text-white-50">Commandes totales</h6>
+                        <h2 class="mb-0">{{ total_orders|default:0 }}</h2>
                     </div>
-                    <i class="bi bi-box" style="font-size: 2rem;"></i>
+                    <i class="bi bi-box" style="font-size: 2.5rem; opacity: 0.5;"></i>
                 </div>
             </div>
         </div>
@@ -25,10 +182,10 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-white-50">Produits</h6>
-                        <h2 class="mb-0">{{ total_products }}</h2>
+                        <h6 class="text-white-50">Chiffre d'affaires</h6>
+                        <h2 class="mb-0">{{ total_revenue|floatformat:0|default:0 }} €</h2>
                     </div>
-                    <i class="bi bi-grid" style="font-size: 2rem;"></i>
+                    <i class="bi bi-currency-euro" style="font-size: 2.5rem; opacity: 0.5;"></i>
                 </div>
             </div>
         </div>
@@ -39,10 +196,10 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-white-50">Utilisateurs</h6>
-                        <h2 class="mb-0">{{ total_users }}</h2>
+                        <h6 class="text-white-50">Panier moyen</h6>
+                        <h2 class="mb-0">{{ average_order|floatformat:0|default:0 }} €</h2>
                     </div>
-                    <i class="bi bi-people" style="font-size: 2rem;"></i>
+                    <i class="bi bi-cart" style="font-size: 2.5rem; opacity: 0.5;"></i>
                 </div>
             </div>
         </div>
@@ -54,50 +211,172 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="text-white-50">En attente</h6>
-                        <h2 class="mb-0">{{ pending_orders }}</h2>
+                        <h2 class="mb-0">{{ pending_orders|default:0 }}</h2>
                     </div>
-                    <i class="bi bi-clock" style="font-size: 2rem;"></i>
+                    <i class="bi bi-clock" style="font-size: 2.5rem; opacity: 0.5;"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Commandes récentes -->
+<!-- ============ STATISTIQUES MENSUELLES ============ -->
+<div class="row g-4 mt-2">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Commandes ce mois</h6>
+                <h3 class="mb-0 text-primary">{{ orders_this_month|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">CA ce mois</h6>
+                <h3 class="mb-0 text-success">{{ revenue_this_month|floatformat:0|default:0 }} €</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Produits</h6>
+                <h3 class="mb-0 text-info">{{ total_products|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Utilisateurs</h6>
+                <h3 class="mb-0 text-warning">{{ total_users|default:0 }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ GRAPHIQUES ============ -->
+<div class="row g-4 mt-2">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Commandes par mois</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 280px;">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Chiffre d'affaires</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 280px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ TOP PRODUITS & CATÉGORIES ============ -->
+<div class="row g-4 mt-2">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Top 5 des produits</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Produit</th>
+                                <th class="text-end">Vendus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in top_products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ product.product__name }}</td>
+                                <td class="text-end"><span class="badge bg-primary">{{ product.total_sold }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Aucune donnée</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Répartition des catégories</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 280px;">
+                    <canvas id="categoriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ COMMANDES RÉCENTES ============ -->
 <div class="row mt-4">
     <div class="col-12">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-transparent">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-clock-history"></i> Commandes récentes</h5>
+                <a href="{% url 'dashboard:orders' %}" class="btn btn-sm btn-primary">
+                    Voir toutes
+                </a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>#</th>
                                 <th>Client</th>
                                 <th>Total</th>
                                 <th>Statut</th>
                                 <th>Date</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for order in recent_orders %}
                             <tr>
-                                <td>{{ order.order_number }}</td>
+                                <td><code>{{ order.order_number }}</code></td>
                                 <td>{{ order.user.username }}</td>
-                                <td>{{ order.total_amount }} €</td>
+                                <td><strong>{{ order.total_amount }} €</strong></td>
                                 <td>
                                     <span class="badge {% if order.status == 'confirmed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% elif order.status == 'shipped' %}bg-info{% elif order.status == 'delivered' %}bg-primary{% else %}bg-danger{% endif %}">
                                         {{ order.get_status_display }}
                                     </span>
                                 </td>
                                 <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'dashboard:order_status' order.id %}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center text-muted">Aucune commande</td>
+                                <td colspan="6" class="text-center text-muted">Aucune commande récente</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -107,4 +386,83 @@
         </div>
     </div>
 </div>
+
+<!-- ============ ACTIONS RAPIDES ============ -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="bi bi-lightning"></i> Actions rapides</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'dashboard:product_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ajouter un produit
+                    </a>
+                    <a href="{% url 'dashboard:categories' %}" class="btn btn-info">
+                        <i class="bi bi-tags"></i> Gérer les catégories
+                    </a>
+                    <a href="{% url 'dashboard:users' %}" class="btn btn-warning">
+                        <i class="bi bi-people"></i> Gérer les utilisateurs
+                    </a>
+                    <a href="{% url 'dashboard:export_orders' %}" class="btn btn-success">
+                        <i class="bi bi-download"></i> Exporter CSV
+                    </a>
+                    <a href="{% url 'admin:index' %}" class="btn btn-secondary">
+                        <i class="bi bi-shield-lock"></i> Admin Django
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ STYLES SUPPLÉMENTAIRES ============ -->
+<style>
+    .table th {
+        font-weight: 600;
+        color: #2E4057;
+    }
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 1rem 1.25rem;
+    }
+    .card-header h5 {
+        font-weight: 600;
+    }
+    .badge {
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+    }
+    .btn {
+        font-weight: 500;
+        border-radius: 8px;
+    }
+    .btn-sm {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    code {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    
+    /* Dark mode support */
+    body.dark-mode .card-header {
+        border-color: rgba(255,255,255,0.05);
+    }
+    body.dark-mode .table-light {
+        background-color: #2d2d44;
+    }
+    body.dark-mode .table-light th {
+        color: #e0e0e0;
+    }
+    body.dark-mode code {
+        background: #2d2d44;
+        color: #e0e0e0;
+    }
+</style>
 {% endblock %}

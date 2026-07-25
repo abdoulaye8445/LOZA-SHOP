@@ -18,4 +18,5 @@ urlpatterns = [
     path('categories/create/', views.category_create, name='category_create'),
     path('categories/edit/<int:pk>/', views.category_edit, name='category_edit'),
     path('categories/delete/<int:pk>/', views.category_delete, name='category_delete'),
+    path('export-orders/', views.export_orders_csv, name='export_orders'),
 ]

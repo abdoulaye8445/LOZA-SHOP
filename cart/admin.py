@@ -7,4 +7,3 @@ class CartItemAdmin(admin.ModelAdmin):
     list_display = ['user', 'product', 'quantity', 'added_at']
     list_filter = ['user', 'added_at']
     search_fields = ['user__username', 'product__name']
-    readonly_fields = ['added_at']

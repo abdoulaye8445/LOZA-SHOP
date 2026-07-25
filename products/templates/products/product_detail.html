@@ -1,107 +1,241 @@
 <!-- products/templates/products/product_detail.html -->
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{{ product.name }} - Ma Boutique{% endblock %}
+{% block title %}{{ product.name }} - ShopHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-gallery {
+        position: sticky;
+        top: 100px;
+    }
+    
+    .product-gallery .main-image {
+        width: 100%;
+        height: 450px;
+        background: white;
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+        border: 1px solid #e9ecef;
+    }
+    
+    .product-gallery .main-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .product-gallery .thumbnail-list {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .product-gallery .thumbnail-list .thumb {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: var(--transition);
+        background: white;
+        box-shadow: var(--shadow);
+        flex-shrink: 0;
+    }
+    
+    .product-gallery .thumbnail-list .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .product-gallery .thumbnail-list .thumb:hover {
+        border-color: var(--primary);
+        transform: scale(1.05);
+    }
+    
+    .product-gallery .thumbnail-list .thumb.active {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.2);
+    }
+    
+    .product-detail-info {
+        background: white;
+        border-radius: var(--radius);
+        padding: 2rem;
+        box-shadow: var(--shadow);
+    }
+    
+    .product-detail-info .product-title {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .product-detail-info .product-price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    .product-detail-info .product-description {
+        color: var(--gray);
+        line-height: 1.8;
+        padding: 1.5rem 0;
+        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    @media (max-width: 992px) {
+        .product-gallery {
+            position: static;
+        }
+        
+        .product-gallery .main-image {
+            height: 350px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .product-gallery .main-image {
+            height: 280px;
+        }
+        
+        .product-detail-info .product-title {
+            font-size: 1.5rem;
+        }
+        
+        .product-detail-info .product-price {
+            font-size: 2rem;
+        }
+        
+        .product-gallery .thumbnail-list .thumb {
+            width: 60px;
+            height: 60px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .product-gallery .main-image {
+            height: 220px;
+        }
+        
+        .product-detail-info {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4 fade-in">
+<div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'products:home' %}">Accueil</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}">Produits</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:home' %}" class="text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}" class="text-decoration-none">Produits</a></li>
             <li class="breadcrumb-item active">{{ product.name }}</li>
         </ol>
     </nav>
 
     <div class="row g-4">
-        <!-- Image -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-0">
+        <!-- Galerie -->
+        <div class="col-lg-6">
+            <div class="product-gallery">
+                <div class="main-image">
                     {% if product.image %}
-                    <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" 
-                         style="width: 100%; height: 400px; object-fit: contain;">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainImage">
                     {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center rounded" 
-                         style="height: 400px;">
-                        <i class="bi bi-image" style="font-size: 5rem; color: #ddd;"></i>
+                    <div class="text-center">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #ccc;"></i>
+                        <p class="text-muted">Aucune image</p>
                     </div>
                     {% endif %}
                 </div>
+                {% if product.get_all_images|length > 1 %}
+                <div class="thumbnail-list">
+                    {% if product.image %}
+                    <div class="thumb active" onclick="changeImage(this, '{{ product.image.url }}')">
+                        <img src="{{ product.image.url }}" alt="Image principale">
+                    </div>
+                    {% endif %}
+                    {% if product.image2 %}
+                    <div class="thumb" onclick="changeImage(this, '{{ product.image2.url }}')">
+                        <img src="{{ product.image2.url }}" alt="Image 2">
+                    </div>
+                    {% endif %}
+                    {% if product.image3 %}
+                    <div class="thumb" onclick="changeImage(this, '{{ product.image3.url }}')">
+                        <img src="{{ product.image3.url }}" alt="Image 3">
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
         </div>
         
         <!-- Informations -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <span class="badge bg-secondary mb-2">{{ product.category.name }}</span>
-                    <h1 class="h2 mb-3">{{ product.name }}</h1>
-                    
-                    <div class="mb-3">
-                        <span class="display-6 text-primary fw-bold">{{ product.price }} €</span>
-                        <span class="badge {% if product.stock > 0 %}bg-success{% else %}bg-danger{% endif %} ms-2">
-                            {% if product.stock > 0 %}
-                                <i class="bi bi-check-circle"></i> En stock ({{ product.stock }} unités)
-                            {% else %}
-                                <i class="bi bi-x-circle"></i> Rupture de stock
-                            {% endif %}
-                        </span>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h5>Description</h5>
-                        <p class="text-muted">{{ product.description|linebreaks }}</p>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
+        <div class="col-lg-6">
+            <div class="product-detail-info">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge-primary">{{ product.category.name }}</span>
+                    <span class="badge {% if product.stock > 0 %}badge-success{% else %}badge-danger{% endif %}">
                         {% if product.stock > 0 %}
-                        <a href="{% url 'cart:add_to_cart' product.id %}" class="btn btn-success btn-lg">
-                            <i class="bi bi-cart-plus"></i> Ajouter au panier
-                        </a>
+                        <i class="bi bi-check-circle"></i> En stock ({{ product.stock }})
                         {% else %}
-                        <button class="btn btn-secondary btn-lg" disabled>
-                            <i class="bi bi-x-circle"></i> Indisponible
-                        </button>
+                        <i class="bi bi-x-circle"></i> Rupture
                         {% endif %}
-                        <a href="{% url 'products:home' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Retour à la boutique
+                    </span>
+                </div>
+                
+                <h1 class="product-title">{{ product.name }}</h1>
+                
+                <div class="product-price">{{ product.price|floatformat:2 }} €</div>
+                
+                <div class="product-description">
+                    {{ product.description|linebreaks }}
+                </div>
+                
+                <div class="d-grid gap-2">
+                    {% if product.stock > 0 %}
+                    <a href="{% url 'cart:add_to_cart' product.id %}" class="btn btn-primary btn-lg" 
+                       style="border-radius: 50px; background: var(--primary); border: none;">
+                        <i class="bi bi-cart-plus"></i> Ajouter au panier
+                    </a>
+                    {% else %}
+                    <button class="btn btn-secondary btn-lg" disabled style="border-radius: 50px;">
+                        <i class="bi bi-x-circle"></i> Indisponible
+                    </button>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'products:add_to_wishlist' product.id %}" 
+                           class="btn btn-outline-danger flex-fill" style="border-radius: 50px;">
+                            <i class="bi {% if product in user.wishlist.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                            {% if product in user.wishlist.all %}Favori{% else %}Ajouter{% endif %}
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'products:home' %}" class="btn btn-outline-secondary flex-fill" style="border-radius: 50px;">
+                            <i class="bi bi-arrow-left"></i> Retour
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Produits similaires -->
-    {% if similar_products %}
-    <div class="row mt-5">
-        <div class="col-12">
-            <h3 class="mb-4"><i class="bi bi-arrow-repeat"></i> Produits similaires</h3>
-        </div>
-        {% for product in similar_products %}
-        <div class="col-6 col-md-3 mb-3">
-            <div class="card product-card h-100 shadow-sm">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" 
-                     style="height: 150px; object-fit: cover;">
-                {% else %}
-                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                     style="height: 150px;">
-                    <i class="bi bi-image" style="font-size: 2rem; color: #ddd;"></i>
-                </div>
-                {% endif %}
-                <div class="card-body">
-                    <h6 class="card-title text-truncate">{{ product.name }}</h6>
-                    <p class="card-text text-primary fw-bold">{{ product.price }} €</p>
-                    <a href="{% url 'products:product_detail' product.slug %}" class="btn btn-sm btn-primary w-100">
-                        Voir
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 </div>
+
+<script>
+function changeImage(element, imageUrl) {
+    document.getElementById('mainImage').src = imageUrl;
+    document.querySelectorAll('.thumbnail-list .thumb').forEach(t => t.classList.remove('active'));
+    element.classList.add('active');
+}
+</script>
 {% endblock %}

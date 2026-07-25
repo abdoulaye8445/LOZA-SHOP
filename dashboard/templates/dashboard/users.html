@@ -64,7 +64,7 @@
                         </td>
                     </tr>
                     
-                    <!-- Modal Détails de l'utilisateur -->
+                    <!-- Modal Détails -->
                     <div class="modal fade" id="userDetailModal{{ user.id }}" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -80,10 +80,6 @@
                                     <div class="mb-3">
                                         <label class="text-muted small">Email</label>
                                         <p>{{ user.email|default:"Non renseigné" }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="text-muted small">Nom complet</label>
-                                        <p>{{ user.get_full_name|default:"Non renseigné" }}</p>
                                     </div>
                                     <div class="mb-3">
                                         <label class="text-muted small">Statut</label>
@@ -104,16 +100,6 @@
                                         <label class="text-muted small">Date d'inscription</label>
                                         <p>{{ user.date_joined|date:"d/m/Y à H:i" }}</p>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="text-muted small">Dernière connexion</label>
-                                        <p>{{ user.last_login|date:"d/m/Y à H:i"|default:"Jamais" }}</p>
-                                    </div>
-                                    <hr>
-                                    <h6>Commandes</h6>
-                                    <p>Nombre de commandes : {{ user.orders.count }}</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                                 </div>
                             </div>
                         </div>

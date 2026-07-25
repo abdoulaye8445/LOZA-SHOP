@@ -1,0 +1,35 @@
+<!-- newsletter/templates/newsletter/email_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1A1A2E; color: #D4AF37; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #D4AF37; color: #1A1A2E; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ LOZA Shop</h1>
+            <p>L'Élégance à Portée de Clic</p>
+        </div>
+        <div class="content">
+            <h2>{{ campaign.subject }}</h2>
+            {% if campaign.image %}
+            <img src="{{ campaign.image.url }}" alt="Image" style="max-width: 100%;">
+            {% endif %}
+            <p>{{ campaign.content|linebreaks }}</p>
+            <a href="{{ site_url }}" class="btn">Découvrir LOZA Shop</a>
+        </div>
+        <div class="footer">
+            <p>© 2026 LOZA Shop - Tous droits réservés</p>
+            <p><a href="{{ site_url }}/newsletter/unsubscribe/{{ subscriber.email }}/">Se désinscrire</a></p>
+        </div>
+    </div>
+</body>
+</html>
