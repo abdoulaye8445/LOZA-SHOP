@@ -1,0 +1,111 @@
+<!-- blog/templates/blog/blog_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - LOZA Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'blog:blog_home' %}">Blog</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'blog:blog_category' post.category.slug %}">{{ post.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ post.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 400px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="display-5">{{ post.title }}</h1>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span class="badge-gold">{{ post.category.name }}</span>
+                        <span class="text-muted small">
+                            <i class="bi bi-person"></i> {{ post.author.username }}
+                        </span>
+                        <span class="text-muted small">
+                            <i class="bi bi-calendar"></i> {{ post.created_at|date:"d/m/Y" }}
+                        </span>
+                        <span class="text-muted small">
+                            <i class="bi bi-eye"></i> {{ post.views }}
+                        </span>
+                    </div>
+                    <div class="blog-content">
+                        {{ post.content|linebreaks }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commentaires -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h5><i class="bi bi-chat"></i> Commentaires ({{ post.comments.count }})</h5>
+                    <hr>
+                    
+                    {% for comment in post.comments.all %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ comment.user.username }}</strong>
+                            <span class="text-muted small">{{ comment.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <p>{{ comment.content }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Aucun commentaire pour cet article.</p>
+                    {% endfor %}
+                    
+                    {% if user.is_authenticated %}
+                    <hr>
+                    <h6>Laisser un commentaire</h6>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.content }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
+                    {% else %}
+                    <p><a href="{% url 'accounts:login' %}">Connectez-vous</a> pour laisser un commentaire.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5>Articles récents</h5>
+                    <ul class="list-unstyled">
+                        {% for recent in recent_posts %}
+                        <li class="mb-2">
+                            <a href="{% url 'blog:blog_detail' recent.slug %}" class="text-decoration-none">
+                                {{ recent.title }}
+                            </a>
+                            <br><small class="text-muted">{{ recent.created_at|date:"d/m/Y" }}</small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-body">
+                    <h5>Catégories</h5>
+                    <ul class="list-unstyled">
+                        {% for category in categories %}
+                        <li>
+                            <a href="{% url 'blog:blog_category' category.slug %}" class="text-decoration-none">
+                                {{ category.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

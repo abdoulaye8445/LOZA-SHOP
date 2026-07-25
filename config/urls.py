@@ -18,6 +18,8 @@ urlpatterns = [
     # ...
     path('newsletter/', include('newsletter.urls')),
     path('notifications/', include('notifications.urls')),
+
+    path('blog/', include('blog.urls')),
 ]
 
 if settings.DEBUG:

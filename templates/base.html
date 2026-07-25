@@ -553,172 +553,139 @@
 </head>
 <body>
     <!-- ============ NAVBAR ============ -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'products:home' %}">
-                LOZA<span class="highlight">Shop</span>
-                <small>✦ LUXURY & ELEGANCE ✦</small>
-            </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
-                           href="{% url 'products:home' %}">
-                            <i class="bi bi-house"></i> Accueil
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}" 
-                           href="{% url 'products:product_list' %}">
-                            <i class="bi bi-grid"></i> Boutique
-                        </a>
-                    </li>
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.app_name == 'orders' %}active{% endif %}" 
-                           href="{% url 'orders:orders' %}">
-                            <i class="bi bi-box"></i> Mes commandes
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
+    <!-- templates/base.html - Version corrigée de la navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'products:home' %}">
+            LOZA<span class="highlight">Shop</span>
+            <small>✦ LUXURY & ELEGANCE ✦</small>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                       href="{% url 'products:home' %}">
+                        <i class="bi bi-house"></i> Accueil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}" 
+                       href="{% url 'products:product_list' %}">
+                        <i class="bi bi-grid"></i> Boutique
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.app_name == 'blog' %}active{% endif %}" 
+                       href="{% url 'blog:blog_home' %}">
+                        <i class="bi bi-newspaper"></i> Blog
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.app_name == 'orders' %}active{% endif %}" 
+                       href="{% url 'orders:orders' %}">
+                        <i class="bi bi-box"></i> Mes commandes
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <!-- Barre de recherche -->
+            <form class="d-flex search-form me-3" method="GET" action="{% url 'products:search' %}">
+                <input class="form-control form-control-sm" type="search" name="q" 
+                       placeholder="Rechercher..." style="width: 180px;">
+                <button class="btn btn-search btn-sm" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+            
+            <ul class="navbar-nav ms-auto">
+                <!-- Dashboard Admin -->
+                {% if user.is_superuser or user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard:index' %}" title="Dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                    </a>
+                </li>
+                {% endif %}
                 
-                <!-- Barre de recherche -->
-                <form class="d-flex search-form me-3" method="GET" action="{% url 'products:search' %}">
-                    <input class="form-control form-control-sm" type="search" name="q" 
-                           placeholder="Rechercher..." style="width: 180px;">
-                    <button class="btn btn-search btn-sm" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
+                <!-- Panier -->
+                <li class="nav-item">
+                    <a class="nav-link position-relative" href="{% url 'cart:cart_view' %}">
+                        <i class="bi bi-bag" style="font-size: 1.2rem;"></i>
+                        {% if cart_total_items > 0 %}
+                        <span class="badge">{{ cart_total_items }}</span>
+                        {% endif %}
+                    </a>
+                </li>
                 
-                <ul class="navbar-nav ms-auto">
-                    <!-- Dashboard Admin -->
-                    {% if user.is_superuser or user.is_staff %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard:index' %}" title="Dashboard">
-                            <i class="bi bi-speedometer2"></i>
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    <!-- Panier -->
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="{% url 'cart:cart_view' %}">
-                            <i class="bi bi-bag" style="font-size: 1.2rem;"></i>
-                            {% if cart_total_items > 0 %}
-                            <span class="badge">{{ cart_total_items }}</span>
-                            {% endif %}
-                        </a>
-                    </li>
-
-
-                    <!-- Dans la navbar, ajouter après le panier -->
-<li class="nav-item dropdown">
-    <a class="nav-link position-relative" href="#" id="notifDropdown" 
-       role="button" data-bs-toggle="dropdown">
-        <i class="bi bi-bell"></i>
-        <span class="badge" id="notifBadge" style="background: var(--secondary); position: absolute; top: -5px; right: -5px; font-size: 0.6rem; padding: 2px 7px; border-radius: 50%;">0</span>
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end" id="notifList" style="width: 350px; max-height: 400px; overflow-y: auto; background: white;">
-        <li><h6 class="dropdown-header">Notifications</h6></li>
-        <li><hr class="dropdown-divider"></li>
-        <li class="text-center text-muted py-2" id="noNotif">Aucune notification</li>
-    </ul>
-</li>
-
-<!-- JavaScript pour les notifications -->
-<script>
-function loadNotifications() {
-    fetch('/notifications/api/')
-        .then(response => response.json())
-        .then(data => {
-            const badge = document.getElementById('notifBadge');
-            const list = document.getElementById('notifList');
-            const noNotif = document.getElementById('noNotif');
-            
-            badge.textContent = data.count;
-            
-            document.querySelectorAll('.notif-item').forEach(el => el.remove());
-            
-            if (data.count > 0) {
-                noNotif.style.display = 'none';
-                data.notifications.forEach(n => {
-                    const item = document.createElement('li');
-                    item.className = 'notif-item';
-                    const link = n.link ? n.link : '#';
-                    item.innerHTML = `
-                        <a href="${link}" class="dropdown-item" style="white-space: normal;">
-                            <strong>${n.title}</strong>
-                            <p class="text-muted small mb-0">${n.message}</p>
-                            <small class="text-muted">${n.created_at}</small>
-                        </a>
-                    `;
-                    list.appendChild(item);
-                });
-            } else {
-                noNotif.style.display = 'block';
-            }
-        });
-}
-
-setInterval(loadNotifications, 30000);
-loadNotifications();
-</script>
-                    
-                    <!-- Utilisateur -->
-                    {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> {{ user.username }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                                    <i class="bi bi-person"></i> Mon profil
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'orders:orders' %}">
-                                    <i class="bi bi-box"></i> Mes commandes
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'products:wishlist' %}">
-                                    <i class="bi bi-heart"></i> Mes favoris
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="post" action="{% url 'accounts:logout' %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="bi bi-box-arrow-right"></i> Déconnexion
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:login' %}">
-                            <i class="bi bi-box-arrow-in-right"></i> Connexion
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn text-white px-3" href="{% url 'accounts:register' %}" 
-                           style="border-radius: 50px; background: var(--gold); color: var(--primary) !important; font-weight: 600;">
-                            S'inscrire
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
+                <!-- Notifications -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link position-relative" href="#" id="notifDropdown" 
+                       role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge" id="notifBadge" style="background: var(--secondary); position: absolute; top: -5px; right: -5px; font-size: 0.6rem; padding: 2px 7px; border-radius: 50%;">0</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" id="notifList" style="width: 350px; max-height: 400px; overflow-y: auto; background: white;">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="text-center text-muted py-2" id="noNotif">Aucune notification</li>
+                    </ul>
+                </li>
+                
+                <!-- Utilisateur -->
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> {{ user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                <i class="bi bi-person"></i> Mon profil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'orders:orders' %}">
+                                <i class="bi bi-box"></i> Mes commandes
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'products:wishlist' %}">
+                                <i class="bi bi-heart"></i> Mes favoris
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'accounts:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:login' %}">
+                        <i class="bi bi-box-arrow-in-right"></i> Connexion
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn text-white px-3" href="{% url 'accounts:register' %}" 
+                       style="border-radius: 50px; background: var(--gold); color: var(--primary) !important; font-weight: 600;">
+                        S'inscrire
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!-- ============ MESSAGES ============ -->
     <div class="container mt-3">
@@ -758,6 +725,16 @@ loadNotifications();
                         <a href="#"><i class="bi bi-pinterest"></i></a>
                     </div>
                 </div>
+
+
+                <div class="col-md-2">
+    <h5>Liens</h5>
+    <a href="{% url 'products:home' %}">Accueil</a>
+    <a href="{% url 'products:product_list' %}">Boutique</a>
+    <a href="{% url 'blog:blog_home' %}">Blog</a>
+    <a href="#">À propos</a>
+    <a href="#">Contact</a>
+</div>
                 <div class="col-lg-2 col-md-4">
                     <h5>Navigation</h5>
                     <a href="{% url 'products:home' %}">Accueil</a>

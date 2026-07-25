@@ -39,6 +39,42 @@
     </div>
 </section>
 
+
+<!-- ============ DERNIERS ARTICLES DU BLOG ============ -->
+{% if recent_posts %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title">📝 Derniers articles</h2>
+        <a href="{% url 'blog:blog_home' %}" class="text-decoration-none" style="color: var(--gold); font-weight: 600;">
+            Voir tout <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+    <div class="row g-4">
+        {% for post in recent_posts %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge-gold">{{ post.category.name }}</span>
+                    <h5 class="mt-2">{{ post.title }}</h5>
+                    <p class="text-muted small">{{ post.excerpt|truncatechars:80 }}</p>
+                    <a href="{% url 'blog:blog_detail' post.slug %}" class="btn btn-primary btn-sm" style="border-radius: 50px;">
+                        Lire la suite <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-muted small">
+                    <i class="bi bi-person"></i> {{ post.author.username }}
+                    <i class="bi bi-calendar ms-2"></i> {{ post.created_at|date:"d/m/Y" }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 <!-- ============ PRODUITS ============ -->
 <div class="container mt-5" id="produits">
     <div class="d-flex justify-content-between align-items-center mb-4">

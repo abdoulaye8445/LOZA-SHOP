@@ -1,0 +1,32 @@
+<!-- blog/templates/blog/blog_category.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - Blog LOZA Shop{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="section-title">{{ category.name }}</h2>
+    <p class="text-muted">{{ category.description }}</p>
+    
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5>{{ post.title }}</h5>
+                    <p>{{ post.excerpt|truncatechars:100 }}</p>
+                    <a href="{% url 'blog:blog_detail' post.slug %}" class="btn btn-primary btn-sm">Lire la suite</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">Aucun article dans cette catégorie.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

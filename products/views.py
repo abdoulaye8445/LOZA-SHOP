@@ -18,6 +18,44 @@ def home(request):
     }
     return render(request, 'products/home.html', context)
 
+
+
+from blog.models import BlogPost
+
+def home(request):
+    products = Product.objects.filter(is_active=True)[:8]
+    categories = Category.objects.all()
+    recent_posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:3]
+    
+    context = {
+        'products': products,
+        'categories': categories,
+        'recent_posts': recent_posts,
+    }
+    return render(request, 'products/home.html', context)
+
+# products/views.py - Ajouter ces fonctions
+
+@login_required
+def toggle_wishlist_ajax(request):
+    """Ajouter/Retirer des favoris via AJAX"""
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Product, id=product_id)
+        
+        wishlist_item, created = Wishlist.objects.get_or_create(
+            user=request.user,
+            product=product
+        )
+        
+        if not created:
+            wishlist_item.delete()
+            return JsonResponse({'status': 'removed', 'message': 'Retiré des favoris'})
+        
+        return JsonResponse({'status': 'added', 'message': 'Ajouté aux favoris'})
+    
+    return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
+
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     
